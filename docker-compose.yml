@@ -1,5 +1,6 @@
 version: "3"
 services:
+  #serviços do back-end
   db_postgres:
     image: postgres
     container_name: db_postgres
@@ -7,7 +8,7 @@ services:
     ports: 
       - 5001:5432
     env_file:
-      - back-end/.env
+      - ./back-end/.env
     volumes:
       - pg_drivenops:/var/lib/postgresql/data
 
@@ -20,6 +21,29 @@ services:
       - db_postgres
     env_file:
       - back-end/.env
-      
+
+  #serviços do front-end
+  react_app:
+    build: ./front-end
+    container_name: react_app
+    volumes:
+      - build_react:/var/www/html
+    env_file:
+      - ./front-end/.env
+  
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - 80:80
+    volumes:
+      - build_react:/var/www/html
+    depends_on:
+      - db_postgres
+      - node_app_drivenops
+      - react_app
+
+#Volumes
 volumes:
   pg_drivenops:
+  build_react:
